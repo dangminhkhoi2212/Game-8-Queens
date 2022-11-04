@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
+    
+    <title>8 Queens Genetic</title>
+</head>
+<body>
+    <div class="loader">
+        <span>Game 8 Queens</span>
+        <span>Game 8 Queens</span>
+    </div>
+    <div class="container">
+        <div class="broad">
+        </div>
+        <div class="tools">
+            <div class="btn">
+                <button onclick="start()"><span>Start</span><i></i></button>
+                <button onclick="help()"><span>Help</span><i></i></button>
+                <button onclick="reset()"><span>Reset</span><i></i></button>
+            </div>
+            <div class="message">
+                <span >Best Time:
+                    <span class="bestCore">00:00:00</span> 
+                </span>
+                <span class="addSeconds">+5</span>
+                <span class="timeMessage">00:00:00</span>
+            </div>
+        </div>
+    </div>
+    <script src="./8queen_genetic.js"></script>
+    <script src="./app.js"></script>
+</body>
+</html>
