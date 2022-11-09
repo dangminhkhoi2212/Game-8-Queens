@@ -72,28 +72,32 @@ body{
     border-radius: 10px;
     display: flex;
     align-items: center;
-    justify-content: center;
-    padding: 20px 0;
+    justify-content:center;
+    padding: 0px 0;
     box-shadow: 0 0 30px 20px #307ea8;
 }
 .broad .square{
     width: 60px;
     height: 60px;
-    margin:2px;
+    margin:4px 2px;
     border-radius: 4px;
-    text-align: center;
-    line-height: 75px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     cursor: pointer;
 }
 .broad .square:hover{
-    background-color: aqua !important;
-    box-shadow: 0 0 5px 2px aqua;
+    /* background-color: aqua !important; */
+    box-shadow: 0 0 5px 4px aqua;
     transition: .3s;
 }
 .broad .square .fa-chess-queen{
     color: #fff;
     font-size: 2.5em;
     display: none;
+}
+.broad .column .help{
+    box-shadow: 0 0 5px 4px #9CFF2E;
 }
 .tools{
     width: 30%;

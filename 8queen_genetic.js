@@ -134,11 +134,11 @@ function solve(numberOfSolutions, solutions) {
             population.push(child2);
         }
         explore += 1
-        console.log(explore);
-        console.log("child1", child1, child1.length, getFitness(child1))
-        console.log("child2", child2, child2.length, getFitness(child2))
-        console.log("length of population:" + population.length)
-        console.log("length of solutions:" + solutions.length)
+        // console.log(explore);
+        // console.log("child1", child1, child1.length, getFitness(child1))
+        // console.log("child2", child2, child2.length, getFitness(child2))
+        // console.log("length of population:" + population.length)
+        // console.log("length of solutions:" + solutions.length)
 
     }
 }

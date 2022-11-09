@@ -27,10 +27,10 @@ function createBroad(){
     broad.innerHTML=temp.join('');
 }
 createBroad()
-var columns=broad.querySelectorAll(".column");
+const columns=broad.querySelectorAll(".column");
 var blue1 = "#307ea8";
-var blue2 = "#002B5B"
-
+var blue2 = "#002B5B";
+var green1 ="#38E54D";
 function printCaro(){
     for (let i = 0; i < columns.length; i++) {
         var rows = columns[i].querySelectorAll(".square");
@@ -57,6 +57,11 @@ function showQueen(columns, solution){
             }
         }
     }
+}
+function showOneQueen(index_row , index_column){
+    var row = columns[index_column].querySelectorAll(".square");;
+    console.log(index_row,index_column);
+    row[index_row].classList.add("help");
 }
 function clock() {
     minutes = 0, seconds = 0, miniseconds = 0;
@@ -97,9 +102,12 @@ function help(){
     setTimeout(function(){
         addSeconds.classList.remove("fiveSeconds");
     }, 2000);
-    if(mark_help==1)
-        showQueen(columns, solutions[0]);
-    else showQueen(columns, [0,0,0,0,0,0,0,0]);
+    var bestSolution=findBestindividual(individual, solutions);
+    do{// kiểm tra lấy những ô chưa được chọn
+        var index_column=random(0,7);
+        var index_row=bestSolution[index_column]-1;
+    }while(individual[index_column]!=0)
+    showOneQueen(index_row, index_column);
 }
 function reset(){
     if (stopTime == false) {
@@ -114,6 +122,13 @@ function reset(){
             rows[j].firstChild.style.display = "none";
         }
         individual[i]=0;
+    }
+    for (let i = 0; i < columns.length; i++) {
+        var rows = columns[i].querySelectorAll(".square");
+        for (let j = 0; j < rows.length; j++) {
+            if(rows[j].classList.contains("help"))
+                rows[j].classList.remove("help");
+        }
     }
     printCaro();
 }
