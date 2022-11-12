@@ -38,15 +38,7 @@ function getBestIndividual(population) {
     deleteIndividual(population, x)
     return individual;
 }
-function crossOver1(father, mother, pointCrossOver) {
-    var child = []
-    for (let i = 0; i < pointCrossOver; i++)
-        child.push(father[i])
-    for (let i = pointCrossOver; i < mother.length; i++)
-        child.push(mother[i])
-    return child;
-}
-function crossOver2(father, mother, pointCrossOver) {
+function crossOver(father, mother, pointCrossOver) {
     var child = []
     for (let i = 0; i < pointCrossOver; i++)
         child.push(father[random(0, 7)]);
@@ -105,7 +97,7 @@ function mutation(child) {
 function goal(fitness) {
     return fitness == fitnessGoal;
 }
-function solve(numberOfSolutions, solutions) {
+function genetic(numberOfSolutions, solutions) {
     var explore = 0;
     var population = [];
     createPopulation(population)
@@ -121,10 +113,8 @@ function solve(numberOfSolutions, solutions) {
         if (goal(getFitness(mother)) == true && isExistArray(mother, solutions) == false)
             solutions.push(mother);
         var pointCrossOver = random(0, 7);
-        // var child1 = crossOver1(father, mother, pointCrossOver);
-        // var child2 = crossOver1(mother, father, pointCrossOver);
-        var child1 = crossOver2(father, mother, pointCrossOver);
-        var child2 = crossOver2(mother, father, pointCrossOver);
+        var child1 = crossOver(father, mother, pointCrossOver);
+        var child2 = crossOver(mother, father, pointCrossOver);
         mutation(child1);
         mutation(child2);
         if (population.includes(child1) == false && isExistArray(child1, father) == false && isExistArray(child1, mother) == false && getFitness(child1) > 20) {
