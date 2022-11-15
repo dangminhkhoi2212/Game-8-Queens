@@ -5,9 +5,12 @@ var timeMessage = document.querySelector(".timeMessage");
 var addSeconds = document.querySelector(".addSeconds");
 var time = '00:00:00';
 var minutes = 0, seconds = 0, miniseconds = 0;
-var temp_minutes = 9999, temp_seconds = 9999, temp_miniseconds = 9999;
-
+var countTime1 =0;
+var countTime2 = Number.MAX_VALUE;
 var interval;
+
+
+
 const individual = [];
 for (let i = 0; i < 8; i++) {
     individual[i] = 0;
@@ -29,31 +32,60 @@ function createBroad() {
     broad.innerHTML = temp.join('');
 }
 createBroad()
+
 const columns = broad.querySelectorAll(".column");
+function getRows(column){
+    return columns[column - 1].querySelectorAll(".square");
+}
+
+
 var blue1 = "#307ea8";
 var blue2 = "#002B5B";
 var green1 = "#38E54D";
-function caro(row,column){
-    var rows = columns[column-1].querySelectorAll(".square");
+function paintCaro(row,column){
+    var rows = getRows(column);
     rows[row-1].style.backgroundColor = blue1;
     if (row % 2 != 0 && column % 2 != 0 || row % 2 == 0 && column % 2 == 0)
         rows[row - 1].style.backgroundColor = blue2;
     else rows[row - 1].style.backgroundColor = blue1;
 }
+function paintRed(row, column){
+    var rows = getRows(column);
+    rows[row - 1].style.backgroundColor = "red";
+}
 function printCaro() {
     for (let i = 0; i < columns.length; i++) {
-        var rows = columns[i].querySelectorAll(".square");
+        var rows = getRows(i+1);
         for (let j = 0; j < rows.length; j++) {
-            caro(j+1, i+1);
+            paintCaro(j+1, i+1);
         }
     }
 }
 printCaro();
+
+
 genetic(92, solutions);
-// console.log("solution", solutions)
+function findBestindividual(individual1, solutions) {
+    var result = solutions[0];
+    var max = -1;
+    for (let i = 0; i < solutions.length; i++) {
+        var count = 0;
+        for (let j = 0; j < individual1.length; j++) {
+            if (individual1[j] == solutions[i][j])
+                count++;
+        }
+        if (max < count) {
+            result = solutions[i];
+            max = count;
+        }
+    }
+    return result;
+}
+
+//////////////////////////////// các hàm chức năng /////////////////////////////
 function showQueen(columns, solution) {// show full queens
     for (let i = 0; i < columns.length; i++) {
-        var rows = columns[i].querySelectorAll(".square");
+        var rows = getRows(i + 1);
         for (let j = 0; j < rows.length; j++) {
             if (parseInt(rows[j].dataset.row) == parseInt(solution[i])) {
                 rows[j].firstChild.style.display = "inline"
@@ -62,12 +94,13 @@ function showQueen(columns, solution) {// show full queens
     }
 }
 function showOneQueen(index_row, index_column) {
-    var row = columns[index_column].querySelectorAll(".square");;
+    var row = getRows(index_column);
     console.log(index_row, index_column);
     row[index_row].classList.add("help");
 }
 function clock() {
     minutes = 0, seconds = 0, miniseconds = 0;
+    countTime1=0;
     interval = setInterval(function () {
         miniseconds++;
         if (miniseconds >= 100) {
@@ -83,7 +116,7 @@ function clock() {
         var ms = miniseconds < 10 ? '0' + miniseconds : miniseconds;
         time = `${m} : ${s} : ${ms}`;
         timeMessage.textContent = time;
-
+        countTime1++;
     }, 10)
 }
 var stopTime = true;
@@ -119,14 +152,14 @@ function reset() {
         clearInterval(interval);
     }
     for (let i = 0; i < columns.length; i++) {
-        var rows = columns[i].querySelectorAll(".square");
+        var rows = getRows(i+1);
         for (let j = 0; j < rows.length; j++) {
             rows[j].firstChild.style.display = "none";
         }
         individual[i] = 0;
     }
     for (let i = 0; i < columns.length; i++) {
-        var rows = columns[i].querySelectorAll(".square");
+        var rows = getRows(i+1);
         for (let j = 0; j < rows.length; j++) {
             if (rows[j].classList.contains("help"))
                 rows[j].classList.remove("help");
@@ -136,17 +169,16 @@ function reset() {
 }
 function alertWin(time) {
     clearInterval(interval);
-    if(temp_minutes > minutes && temp_seconds> seconds && temp_miniseconds> miniseconds){
-        temp_minutes =minutes;
-        temp_seconds =seconds;
-        temp_miniseconds = miniseconds;
+    if(countTime1 < countTime2){
+        countTime2=countTime1;
         bestCore.innerHTML = time;
     }
     timeMessage.innerHTML = "You Win 🎉";
 }
+//////////////////// Tạo ràng buộc cho full broad ///////////////////
 
 function isContrains(row, column) {
-    var rows = columns[column - 1].querySelectorAll(".square");
+    var rows = getRows(column);
     // kiểm tra hàng dọc
     for (let i = 0; i < rows.length; i++) {
         if (individual[i] != 0 && individual[i] != row && i + 1 == column)
@@ -164,7 +196,6 @@ function isContrains(row, column) {
     }
     return false;
 }
-//////////////////// Tạo ràng buộc cho full broad ///////////////////
 function coord(row, column){
     this.row=row;
     this.column=column;
@@ -173,7 +204,7 @@ function getConstrain(row, column){
     var constrainOfOneSquare=[];
     var r, c,temp;
 
-    //hang doc
+    // hàng dọc
     for(r=1;r<=MAX_LENGTH; r++){
         if(r!=row){
             temp=new coord(r, column);
@@ -181,7 +212,7 @@ function getConstrain(row, column){
                 constrainOfOneSquare.push(temp);
         }
     }
-    //hang ngang
+    // hàng ngang
     for (c = 1; c <= MAX_LENGTH; c++) {
         if (c != column) {
             temp = new coord(row, c);
@@ -189,25 +220,25 @@ function getConstrain(row, column){
                 constrainOfOneSquare.push(temp);
         }
     }
-    //ràng buộc chéo trên trái
+    // chéo trên trái
     for (r = row - 1, c = column - 1; r >= 1 && c >= 1; r--, c--) {
         temp = new coord(r, c);
         if (constrainOfOneSquare.includes(temp) == false)
             constrainOfOneSquare.push(temp);
     }
-    // ràng buộc chéo dưới trái
+    // chéo dưới trái
     for (r = row +1, c = column - 1; r<= MAX_LENGTH && c >= 1; r++, c--) {
         temp = new coord(r, c);
         if (constrainOfOneSquare.includes(temp) == false)
             constrainOfOneSquare.push(temp);
     }
-    // ràng buộc chéo trên phải
+    // chéo trên phải
     for (r = row - 1, c = column + 1; r >= 1 && c <=MAX_LENGTH; r--, c++) {
         temp = new coord(r, c);
         if(constrainOfOneSquare.includes(temp)==false)
-            constrainOfOneSquare.push(temp);
+            constrainOfOneSquare.push(temp); 
     }
-    // ràng buộc chéo dưới phải
+    // chéo dưới phải
     for (r = row + 1, c = column + 1; r <=MAX_LENGTH && c <=MAX_LENGTH; r++, c++) {
         temp = new coord(r, c);
         if (constrainOfOneSquare.includes(temp) == false)
@@ -216,40 +247,36 @@ function getConstrain(row, column){
     return constrainOfOneSquare;
 }
 console.log(getConstrain(1,2));
-///////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
 function checkContrainsFullBroad(row, column){
     var constrains = getConstrain(row, column);
-    var rows=columns[column-1].querySelectorAll(".square");
+    var rows=getRows(column);
     var count=0;
     for(let i=0; i<constrains.length; i++){
         var coord=constrains[i];
-        var square=columns[coord.column-1].querySelectorAll(".square")[coord.row-1];
+        var square=getRows(coord.column)[coord.row-1];
         // console.log(square)
         if (getComputedStyle(square.firstChild).display != "none" && getComputedStyle(rows[row - 1].firstChild).display != "none"){
-            square.style.backgroundColor = "red";
-            rows[row - 1].style.backgroundColor = "red";
+            paintRed(coord.row, coord.column);
+            paintRed(row, column);
             count++;
         }
         else{
-            caro(coord.row, coord.column);
+            paintCaro(coord.row, coord.column);
         } 
     }
     if(count==0)
-        caro(row, column);
+        paintCaro(row, column);
 }
 function chooseQueen(square) {
     var index_row = parseInt(square.dataset.row);
     var index_column = parseInt(square.dataset.column);
     console.log(index_row, index_column)
-    console.log(getComputedStyle(square.firstChild).display)
     if (getComputedStyle(square.firstChild).display == "none") {
-        square.firstChild.style.display = "block";
+        square.firstChild.style.display = "inline";
         if (individual[index_column - 1] == 0)
             individual[index_column - 1] = index_row;
-        // if (isContrains(index_row, index_column) == true) {
-        //     square.style.backgroundColor = "red";
-        // }
     }
     else {
         square.firstChild.style.display = "none";
@@ -257,29 +284,12 @@ function chooseQueen(square) {
             if (individual[i] == index_row && i + 1 == index_column)
                 individual[index_column - 1] = 0;
         }
-        // caro(index_row, index_column);
     }
-    console.log(individual, 'fitness = ',getFitness(individual))
+    console.log(individual,getFitness(individual))
     console.log(findBestindividual(individual, solutions))
 
     checkContrainsFullBroad(index_row, index_column);
     if (individual.includes(0)==false && goal(getFitness(individual)) == true) {
         alertWin(time);
     }
-}
-function findBestindividual(individual1, solutions) {
-    var result = solutions[0];
-    var max = -1;
-    for (let i = 0; i < solutions.length; i++) {
-        var count = 0;
-        for (let j = 0; j < individual1.length; j++) {
-            if (individual1[j] == solutions[i][j])
-                count++;
-        }
-        if (max < count) {
-            result = solutions[i];
-            max = count;
-        }
-    }
-    return result;
 }
