@@ -2,6 +2,10 @@ const MAX_LENGTH =8;
 var broad = document.querySelector(".broad");
 var bestCore = document.querySelector(".bestCore");
 var timeMessage = document.querySelector(".timeMessage");
+var mesMinutes=document.querySelector(".minutes");
+var mesSeconds = document.querySelector(".seconds");
+var mesMiniSeconds = document.querySelector(".miniseconds");
+
 var addSeconds = document.querySelector(".addSeconds");
 var time = '00:00:00';
 var minutes = 0, seconds = 0, miniseconds = 0;
@@ -94,7 +98,7 @@ function showQueen(columns, solution) {// show full queens
     }
 }
 function showOneQueen(index_row, index_column) {
-    var row = getRows(index_column);
+    var row = getRows(index_column+1);
     console.log(index_row, index_column);
     row[index_row].classList.add("help");
 }
@@ -115,7 +119,9 @@ function clock() {
         var s = seconds < 10 ? '0' + seconds : seconds;
         var ms = miniseconds < 10 ? '0' + miniseconds : miniseconds;
         time = `${m} : ${s} : ${ms}`;
-        timeMessage.textContent = time;
+        mesMinutes.textContent=m;
+        mesSeconds.textContent=s;
+        mesMiniSeconds.textContent=ms;
         countTime1++;
     }, 10)
 }
@@ -147,8 +153,9 @@ function help() {
 function reset() {
     if (stopTime == false) {
         stopTime = true
-        time = '00:00:00';
-        timeMessage.textContent = time;
+        mesMinutes.textContent = '00';
+        mesSeconds.textContent = '00';
+        mesMiniSeconds.textContent = '00';
         clearInterval(interval);
     }
     for (let i = 0; i < columns.length; i++) {
@@ -173,7 +180,9 @@ function alertWin(time) {
         countTime2=countTime1;
         bestCore.innerHTML = time;
     }
-    timeMessage.innerHTML = "You Win 🎉";
+    mesMinutes.textContent = "You";
+    mesSeconds.textContent = "Win";
+    mesMiniSeconds.textContent = "🎉";
 }
 //////////////////// Tạo ràng buộc cho full broad ///////////////////
 
