@@ -78,14 +78,11 @@ function clock() {
             seconds = 0;
             minutes += 1;
         }
-        minutes = minutes < 10 ? '0' + minutes : minutes;
-        seconds = seconds < 10 ? '0' + seconds : seconds;
-        miniseconds = miniseconds < 10 ? '0' + miniseconds : miniseconds;
-        time = `${minutes} : ${seconds} : ${miniseconds}`;
+        var m = minutes < 10 ? '0' + minutes : minutes;
+        var s = seconds < 10 ? '0' + seconds : seconds;
+        var ms = miniseconds < 10 ? '0' + miniseconds : miniseconds;
+        time = `${m} : ${s} : ${ms}`;
         timeMessage.textContent = time;
-        minutes = parseInt(minutes);
-        seconds = parseInt(seconds);
-        miniseconds = parseInt(miniseconds);
 
     }, 10)
 }
@@ -139,8 +136,12 @@ function reset() {
 }
 function alertWin(time) {
     clearInterval(interval);
-    if(temp_minutes > minutes && temp_seconds> seconds && temp_miniseconds> miniseconds)
+    if(temp_minutes > minutes && temp_seconds> seconds && temp_miniseconds> miniseconds){
+        temp_minutes =minutes;
+        temp_seconds =seconds;
+        temp_miniseconds = miniseconds;
         bestCore.innerHTML = time;
+    }
     timeMessage.innerHTML = "You Win 🎉";
 }
 
