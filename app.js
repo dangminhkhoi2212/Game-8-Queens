@@ -1,12 +1,14 @@
-
+const MAX_LENGTH =8;
 var broad = document.querySelector(".broad");
 var bestCore = document.querySelector(".bestCore");
 var timeMessage = document.querySelector(".timeMessage");
 var addSeconds = document.querySelector(".addSeconds");
 var time = '00:00:00';
 var minutes = 0, seconds = 0, miniseconds = 0;
+var temp_minutes = 9999, temp_seconds = 9999, temp_miniseconds = 9999;
+
 var interval;
-var individual = [];
+const individual = [];
 for (let i = 0; i < 8; i++) {
     individual[i] = 0;
 }
@@ -68,11 +70,11 @@ function clock() {
     minutes = 0, seconds = 0, miniseconds = 0;
     interval = setInterval(function () {
         miniseconds++;
-        if (miniseconds == 100) {
+        if (miniseconds >= 100) {
             miniseconds = 0;
             seconds += 1;
         }
-        if (seconds == 60) {
+        if (seconds >= 60) {
             seconds = 0;
             minutes += 1;
         }
@@ -137,7 +139,8 @@ function reset() {
 }
 function alertWin(time) {
     clearInterval(interval);
-    bestCore.innerHTML = time;
+    if(temp_minutes > minutes && temp_seconds> seconds && temp_miniseconds> miniseconds)
+        bestCore.innerHTML = time;
     timeMessage.innerHTML = "You Win 🎉";
 }
 
@@ -160,24 +163,79 @@ function isContrains(row, column) {
     }
     return false;
 }
-function checkContrainsFullBroad(row, column) {
-    for (var i = 0; i < individual.length; i++) {
-        if (individual[i] == 0)
-        continue;
-        let columnOfIndividual = i+1;
-        let rowOfIndividual = parseInt(individual[i]);
+//////////////////// Tạo ràng buộc cho full broad ///////////////////
+function coord(row, column){
+    this.row=row;
+    this.column=column;
+}
+function getConstrain(row, column){
+    var constrainOfOneSquare=[];
+    var r, c,temp;
 
-        let rows = columns[columnOfIndividual-1].querySelectorAll(".square");
-        if (isContrains(rowOfIndividual, columnOfIndividual) == true || i + 1 == column && individual[i] != row && getComputedStyle(rows[row-1].firstChild).display != "none") {
-            rows[rowOfIndividual-1].style.backgroundColor = "red";
-            var row_pushing = columns[column - 1].querySelectorAll(".square");
-            row_pushing[row - 1].style.backgroundColor = "red";
-        }
-        else {
-            caro(rowOfIndividual, columnOfIndividual);
-            caro(row, column);
+    //hang doc
+    for(r=1;r<=MAX_LENGTH; r++){
+        if(r!=row){
+            temp=new coord(r, column);
+            if (constrainOfOneSquare.includes(temp) == false)
+                constrainOfOneSquare.push(temp);
         }
     }
+    //hang ngang
+    for (c = 1; c <= MAX_LENGTH; c++) {
+        if (c != column) {
+            temp = new coord(row, c);
+            if (constrainOfOneSquare.includes(temp) == false)
+                constrainOfOneSquare.push(temp);
+        }
+    }
+    //ràng buộc chéo trên trái
+    for (r = row - 1, c = column - 1; r >= 1 && c >= 1; r--, c--) {
+        temp = new coord(r, c);
+        if (constrainOfOneSquare.includes(temp) == false)
+            constrainOfOneSquare.push(temp);
+    }
+    // ràng buộc chéo dưới trái
+    for (r = row +1, c = column - 1; r<= MAX_LENGTH && c >= 1; r++, c--) {
+        temp = new coord(r, c);
+        if (constrainOfOneSquare.includes(temp) == false)
+            constrainOfOneSquare.push(temp);
+    }
+    // ràng buộc chéo trên phải
+    for (r = row - 1, c = column + 1; r >= 1 && c <=MAX_LENGTH; r--, c++) {
+        temp = new coord(r, c);
+        if(constrainOfOneSquare.includes(temp)==false)
+            constrainOfOneSquare.push(temp);
+    }
+    // ràng buộc chéo dưới phải
+    for (r = row + 1, c = column + 1; r <=MAX_LENGTH && c <=MAX_LENGTH; r++, c++) {
+        temp = new coord(r, c);
+        if (constrainOfOneSquare.includes(temp) == false)
+            constrainOfOneSquare.push(temp);
+    }
+    return constrainOfOneSquare;
+}
+console.log(getConstrain(1,2));
+///////////////////////////////////////////////////////////////////////
+
+function checkContrainsFullBroad(row, column){
+    var constrains = getConstrain(row, column);
+    var rows=columns[column-1].querySelectorAll(".square");
+    var count=0;
+    for(let i=0; i<constrains.length; i++){
+        var coord=constrains[i];
+        var square=columns[coord.column-1].querySelectorAll(".square")[coord.row-1];
+        // console.log(square)
+        if (getComputedStyle(square.firstChild).display != "none" && getComputedStyle(rows[row - 1].firstChild).display != "none"){
+            square.style.backgroundColor = "red";
+            rows[row - 1].style.backgroundColor = "red";
+            count++;
+        }
+        else{
+            caro(coord.row, coord.column);
+        } 
+    }
+    if(count==0)
+        caro(row, column);
 }
 function chooseQueen(square) {
     var index_row = parseInt(square.dataset.row);
@@ -185,7 +243,7 @@ function chooseQueen(square) {
     console.log(index_row, index_column)
     console.log(getComputedStyle(square.firstChild).display)
     if (getComputedStyle(square.firstChild).display == "none") {
-        square.firstChild.style.display = "inline";
+        square.firstChild.style.display = "block";
         if (individual[index_column - 1] == 0)
             individual[index_column - 1] = index_row;
         // if (isContrains(index_row, index_column) == true) {
@@ -200,12 +258,13 @@ function chooseQueen(square) {
         }
         // caro(index_row, index_column);
     }
+    console.log(individual, 'fitness = ',getFitness(individual))
+    console.log(findBestindividual(individual, solutions))
+
     checkContrainsFullBroad(index_row, index_column);
-    if (goal(getFitness(individual)) == true) {
+    if (individual.includes(0)==false && goal(getFitness(individual)) == true) {
         alertWin(time);
     }
-    console.log(individual)
-    console.log(findBestindividual(individual, solutions))
 }
 function findBestindividual(individual1, solutions) {
     var result = solutions[0];

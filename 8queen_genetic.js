@@ -5,7 +5,7 @@ const fitnessGoal = 28;
 function getFitness(invididual) {
     var conflict = 0;
     var length = invididual.length;
-    for (let i = 0; i < length; i++) {
+    for (let i = 0; i < length-1; i++) {
         for (let j = i + 1; j < length; j++)
             if (invididual[i] == invididual[j] || Math.abs(invididual[j] - invididual[i]) == Math.abs(j - i))
                 conflict += 1;
