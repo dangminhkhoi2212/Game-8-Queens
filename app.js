@@ -14,10 +14,10 @@ var countTime2 = Number.MAX_VALUE;
 var interval;
 
 
-
+const temp_individual=[];
 const individual = [];
 for (let i = 0; i < 8; i++) {
-    individual[i] = 0;
+    temp_individual[i]=individual[i] = 0;
 }
 var solutions = [];
 
@@ -255,7 +255,6 @@ function getConstrain(row, column){
     }
     return constrainOfOneSquare;
 }
-console.log(getConstrain(1,2));
 ////////////////////////////////////////////////////////////////////////////////
 
 function checkContrainsFullBroad(row, column){
@@ -286,16 +285,22 @@ function chooseQueen(square) {
         square.firstChild.style.display = "inline";
         if (individual[index_column - 1] == 0)
             individual[index_column - 1] = index_row;
+        else temp_individual[index_column-1]=index_row;
     }
     else {
         square.firstChild.style.display = "none";
         for (let i = 0; i < individual.length; i++) {
-            if (individual[i] == index_row && i + 1 == index_column)
-                individual[index_column - 1] = 0;
+            if (individual[i] == index_row && i + 1 == index_column){
+                if(temp_individual[i]!=0){
+                    individual[index_column - 1] = temp_individual[i];
+                    temp_individual[i]=0;
+                }
+                else individual[index_column - 1] = 0;
+            }
         }
     }
-    console.log(individual,getFitness(individual))
-    console.log(findBestindividual(individual, solutions))
+    console.log(individual, getFitness(individual));
+    console.log(findBestindividual(individual, solutions));
 
     checkContrainsFullBroad(index_row, index_column);
     if (individual.includes(0)==false && goal(getFitness(individual)) == true) {
