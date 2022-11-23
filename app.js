@@ -150,6 +150,19 @@ function help() {
     } while (individual[index_column] != 0)
     showOneQueen(index_row, index_column);
 }
+function autoSolve(btn){
+    reset();
+    let solution =solutions[random(0, 91)];
+    for (let i = 0; i < columns.length; i++) {
+        var rows = getRows(i + 1);
+        for (let j = 0; j < rows.length; j++) {
+            if (parseInt(rows[j].dataset.row) == parseInt(solution[i])) {
+                rows[j].firstChild.style.display = "inline";
+                rows[j].classList.add("help");
+            }
+        }
+    }
+}
 function reset() {
     if (stopTime == false) {
         stopTime = true
